@@ -22,7 +22,7 @@ class DeepLabModel(object):
     self.graph = tf.Graph()
 
     graph_def = None
-    graph_def = tf.GraphDef.FromString(open(tarball_path + "/frozen_inference_graph.pb", "rb").read()) 
+    graph_def = tf.compat.v1.GraphDef.FromString(open(tarball_path + "/frozen_inference_graph.pb", "rb").read()) 
 
     if graph_def is None:
       raise RuntimeError('Cannot find inference graph in tar archive.')
@@ -30,7 +30,7 @@ class DeepLabModel(object):
     with self.graph.as_default():
       tf.import_graph_def(graph_def, name='')
 
-    self.sess = tf.Session(graph=self.graph)
+    self.sess = tf.compat.v1.Session(graph=self.graph)
 
   def run(self, image):
     """Runs inference on a single image.
@@ -76,14 +76,14 @@ def drawSegment(baseImg, matImg):
 
 
 inputFilePath = sys.argv[1]
-outputFilePath = sys.argv[2]
+outputFilePath = "output.png"
 
 if inputFilePath is None or outputFilePath is None:
   print("Bad parameters. Please specify input file path and output file path")
   exit()
 
 modelType = "mobile_net_model"
-if len(sys.argv) > 3 and sys.argv[3] == "1":
+if len(sys.argv) > 2 and sys.argv[2] == "1":
   modelType = "xception_model"
 
 MODEL = DeepLabModel(modelType)
